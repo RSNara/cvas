@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Socket IO</title>
+</head>
+<body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    () => {
+      const socket = io();
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      initCanvas();
+      window.addEventListener('resize', initCanvas);
+      document.body.style.margin = '0';
+      document.body.style.overflow = 'hidden';
+      document.body.appendChild(canvas);
+
+      function initCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        canvas.style.backgroundColor = 'rgba(33,150,250,0.1)';
+      }
+
+      function updateAllConnected() {
+        socket.emit('canvas', canvas.toDataURL());
+      }
+
+      function processUpdates(dataURL) {
+        const image = new Image();
+        image.src = dataURL;
+        ctx.drawImage(image, 0, 0);
+      }
+
+      const state = {
+        mousedown: null
+      };
+
+      canvas.addEventListener('mouseup', () => {
+        state.mousedown = false;
+      });
+
+      canvas.addEventListener('mousedown', (event) => {
+        state.mousedown = true;
+        ctx.beginPath();
+        ctx.moveTo(event.clientX, event.clientY);
+      });
+
+      canvas.addEventListener('mousemove', (event) => {
+        if (state.mousedown) {
+          ctx.lineTo(event.clientX, event.clientY);
+          ctx.stroke();
+          updateAllConnected();
+        }
+      });
+
+      socket.on('canvas', processUpdates);
+    }()
+  </script>
+</body>
+</html>
