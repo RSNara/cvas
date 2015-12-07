@@ -24,39 +24,39 @@
         canvas.style.backgroundColor = 'rgba(33,150,250,0.1)';
       }
 
-      function updateAllConnected() {
-        socket.emit('canvas', canvas.toDataURL());
-      }
-
-      function processUpdates(dataURL) {
-        const image = new Image();
-        image.src = dataURL;
-        ctx.drawImage(image, 0, 0);
-      }
-
       const state = {
         mousedown: null
       };
 
-      canvas.addEventListener('mouseup', () => {
+      const socketEmit = (message) => [message, (event) => {
+        if (event.which === 1) {
+          socket.emit(message, {
+            clientX: event.clientX,
+            clientY: event.clientY,
+          });
+        }
+      }];
+
+      canvas.addEventListener(...socketEmit('mouseup'));
+      canvas.addEventListener(...socketEmit('mousedown'));
+      canvas.addEventListener(...socketEmit('mousemove'));
+
+      socket.on('mouseup', () => {
         state.mousedown = false;
       });
 
-      canvas.addEventListener('mousedown', (event) => {
+      socket.on('mousedown', (event) => {
         state.mousedown = true;
         ctx.beginPath();
         ctx.moveTo(event.clientX, event.clientY);
       });
 
-      canvas.addEventListener('mousemove', (event) => {
+      socket.on('mousemove', (event) => {
         if (state.mousedown) {
           ctx.lineTo(event.clientX, event.clientY);
           ctx.stroke();
-          updateAllConnected();
         }
       });
-
-      socket.on('canvas', processUpdates);
     })();
   </script>
 </body>

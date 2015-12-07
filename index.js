@@ -20,12 +20,12 @@ app.get('/', (request, response) => {
   response.sendFile(path.join(__dirname, '/index.html'));
 });
 
-var canvas = '';
+const ioEmit = (message) => [message, (data) => {
+  io.emit(message, data);
+}];
 
 io.on('connection', (socket) => {
-  socket.emit('canvas', canvas);
-  socket.on('canvas', (data) => {
-    canvas = data;
-    socket.broadcast.emit('canvas', canvas);
-  });
+  socket.on(...ioEmit('mouseup'));
+  socket.on(...ioEmit('mousedown'));
+  socket.on(...ioEmit('mousemove'));
 });
