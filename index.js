@@ -20,11 +20,15 @@ app.get('/', (request, response) => {
   response.sendFile(path.join(__dirname, '/index.html'));
 });
 
-const ioEmit = (message) => [message, (data) => {
-  io.emit(message, data);
+
+var events = [];
+const ioEmit = (event) => [event, (data) => {
+  events.push([event, data]);
+  io.emit(event, data);
 }];
 
 io.on('connection', (socket) => {
+  socket.emit('init', events);
   socket.on(...ioEmit('mouseup'));
   socket.on(...ioEmit('mousedown'));
   socket.on(...ioEmit('mousemove'));

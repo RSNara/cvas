@@ -41,22 +41,34 @@
       canvas.addEventListener(...socketEmit('mousedown'));
       canvas.addEventListener(...socketEmit('mousemove'));
 
-      socket.on('mouseup', () => {
-        state.mousedown = false;
+      const handlers = {
+        mouseup: () => {
+          state.mousedown = false;
+        },
+        mousedown: (event) => {
+          state.mousedown = true;
+          ctx.beginPath();
+          ctx.moveTo(event.clientX, event.clientY);
+        },
+        mousemove: (event) => {
+          if (state.mousedown) {
+            ctx.lineTo(event.clientX, event.clientY);
+            ctx.stroke();
+          }
+        },
+      };
+
+      socket.on('init', (events) => {
+        events.forEach((data) => {
+          const eventName = data[0];
+          const eventData = data[1];
+          handlers[eventName](eventData);
+        });
       });
 
-      socket.on('mousedown', (event) => {
-        state.mousedown = true;
-        ctx.beginPath();
-        ctx.moveTo(event.clientX, event.clientY);
-      });
-
-      socket.on('mousemove', (event) => {
-        if (state.mousedown) {
-          ctx.lineTo(event.clientX, event.clientY);
-          ctx.stroke();
-        }
-      });
+      socket.on('mouseup', handlers.mouseup);
+      socket.on('mousedown', handlers.mousedown);
+      socket.on('mousemove', handlers.mousemove);
     })();
   </script>
 </body>
