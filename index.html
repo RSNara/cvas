@@ -11,17 +11,35 @@
       const socket = io();
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
+      const clearButton = document.createElement('button');
 
+      initBody();
       initCanvas();
+      initClearButton();
       window.addEventListener('resize', initCanvas);
-      document.body.style.margin = '0';
-      document.body.style.overflow = 'hidden';
+
+      document.body.appendChild(clearButton);
       document.body.appendChild(canvas);
+
+      function initBody() {
+        document.body.style.margin = '0';
+        document.body.style.overflow = 'hidden';
+      }
 
       function initCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         canvas.style.backgroundColor = 'rgba(33,150,250,0.1)';
+      }
+
+      function initClearButton() {
+        clearButton.type = 'button';
+        clearButton.innerHTML = 'Clear';
+        Object.assign(clearButton.style, {
+          position: 'fixed',
+          margin: '1rem',
+          fontSize: 'xx-large',
+        });
       }
 
       const state = {
@@ -37,6 +55,11 @@
         }
       }];
 
+      function resetServerState() {
+        socket.emit('reset');
+      }
+
+      clearButton.addEventListener('click', resetServerState);
       canvas.addEventListener(...socketEmit('mouseup'));
       canvas.addEventListener(...socketEmit('mousedown'));
       canvas.addEventListener(...socketEmit('mousemove'));
@@ -69,6 +92,11 @@
       socket.on('mouseup', handlers.mouseup);
       socket.on('mousedown', handlers.mousedown);
       socket.on('mousemove', handlers.mousemove);
+      socket.on('reset', clearCanvas);
+
+      function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
     })();
   </script>
 </body>

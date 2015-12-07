@@ -32,4 +32,8 @@ io.on('connection', (socket) => {
   socket.on(...ioEmit('mouseup'));
   socket.on(...ioEmit('mousedown'));
   socket.on(...ioEmit('mousemove'));
+  socket.on('reset', () => {
+    events.length = 0;
+    io.emit('reset');
+  });
 });
