@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "synchronized canvas experiment",
   "main": "index.js",
+  "engines": {
+    "node": "~5.2",
+    "npm": "~3.3"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
