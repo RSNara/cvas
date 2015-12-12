@@ -46,14 +46,16 @@
         mousedown: null
       };
 
-      const socketEmit = (message) => [message, (event) => {
-        if (event.which === 1) {
-          socket.emit(message, {
-            clientX: event.clientX,
-            clientY: event.clientY,
-          });
+      const socketEmit = (message) => [
+        message, (event) => {
+          if (event.which === 1) {
+            socket.emit(message, {
+              clientX: event.clientX,
+              clientY: event.clientY,
+            });
+          }
         }
-      }];
+      ];
 
       function resetServerState() {
         socket.emit('reset');
