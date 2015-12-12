@@ -22,10 +22,13 @@ app.get('/', (request, response) => {
 
 
 var events = [];
-const ioEmit = (event) => [event, (data) => {
-  events.push([event, data]);
-  io.emit(event, data);
-}];
+const ioEmit = (eventName) => [
+  eventName,
+  (eventData) => {
+    events.push([eventName, eventData]);
+    io.emit(eventName, eventData);
+  }
+];
 
 io.on('connection', (socket) => {
   socket.emit('init', events);
